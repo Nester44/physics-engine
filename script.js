@@ -2,71 +2,93 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-let x  = 100;
-let y = 100;
+const BALLZ = [];
 
 let LEFT, UP, RIGHT, DOWN;
 
-function drawBall(x, y, r) {
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, 2 * Math.PI);
-  ctx.strokeStyle = 'black';
-  ctx.stroke();
-  ctx.fillStyle = 'red';
-  ctx.fill();
+
+class Ball {
+  constructor(x, y, r) {
+    this.x = x;
+    this.y = y;
+    this.r = r;
+    this.player = false;
+    BALLZ.push(this);
+  }
+  drawBall() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+    ctx.strokeStyle = 'black';
+    ctx.stroke();
+    ctx.fillStyle = 'red';
+    ctx.fill();
+  }
 }
 
-canvas.addEventListener('keydown', (e) => {
-  console.log(e.key);
-  if (e.key === 'a') {
-    LEFT = true;
-  }
-  if (e.key === 'w') {
-    UP = true;
-  }
-  if (e.key === 'd') {
-    RIGHT = true;
-  }
-  if (e.key === 's') {
-    DOWN = true;
-  }
-});
+function keyControl(b) {
+  canvas.addEventListener('keydown', (e) => {
+    console.log(e.key);
+    if (e.key === 'a') {
+      LEFT = true;
+    }
+    if (e.key === 'w') {
+      UP = true;
+    }
+    if (e.key === 'd') {
+      RIGHT = true;
+    }
+    if (e.key === 's') {
+      DOWN = true;
+    }
+  });
 
-canvas.addEventListener('keyup', (e) => {
-  if (e.key === 'a') {
-    LEFT = false;
-  }
-  if (e.key === 'w') {
-    UP = false;
-  }
-  if (e.key === 'd') {
-    RIGHT = false;
-  }
-  if (e.key === 's') {
-    DOWN = false;
-  }
-});
+  canvas.addEventListener('keyup', (e) => {
+    if (e.key === 'a') {
+      LEFT = false;
+    }
+    if (e.key === 'w') {
+      UP = false;
+    }
+    if (e.key === 'd') {
+      RIGHT = false;
+    }
+    if (e.key === 's') {
+      DOWN = false;
+    }
+  });
 
 
-function move() {
   if (LEFT) {
-    x--;
+    b.x--;
   }
   if (UP) {
-    y--;
+    b.y--;
   }
   if (RIGHT) {
-    x++;
+    b.x++;
   }
   if (DOWN) {
-    y++;
+    b.y++;
   }
+
 }
+
+
+const Ball1 = new Ball(200, 200, 30);
+const Ball2 = new Ball(300, 300, 20);
+
+Ball1.player = true;
+Ball2.player = true;
 
 function mainLoop() {
   ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-  move();
-  drawBall(x, y, 30);
+  BALLZ.forEach((b) => {
+    if (b.player) {
+      keyControl(b);
+    }
+    b.drawBall();
+  });
   requestAnimationFrame(mainLoop);
 }
+
 requestAnimationFrame(mainLoop);
