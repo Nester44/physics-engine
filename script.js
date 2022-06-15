@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 'use strict';
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -5,13 +6,18 @@ const ctx = canvas.getContext('2d');
 const BALLZ = [];
 
 let LEFT, UP, RIGHT, DOWN;
-
+const friction = 0.1;
 
 class Ball {
   constructor(x, y, r) {
     this.x = x;
     this.y = y;
     this.r = r;
+    this.vel_x = 0;
+    this.vel_y = 0;
+    this.acc_x = 0;
+    this.acc_y = 0;
+    this.accelereation = 1;
     this.player = false;
     BALLZ.push(this);
   }
@@ -23,70 +29,90 @@ class Ball {
     ctx.fillStyle = 'red';
     ctx.fill();
   }
+
+  display() {
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.x + this.acc_x * 100, this.y + this.acc_y * 100);
+    ctx.strokeStyle = 'green';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.x + this.vel_x * 10, this.y + this.vel_y * 10);
+    ctx.strokeStyle = 'blue';
+    ctx.stroke();
+  }
 }
 
 function keyControl(b) {
   canvas.addEventListener('keydown', (e) => {
-    console.log(e.key);
-    if (e.key === 'a') {
+    if (e.code === 'KeyA') {
       LEFT = true;
     }
-    if (e.key === 'w') {
+    if (e.code === 'KeyW') {
       UP = true;
     }
-    if (e.key === 'd') {
+    if (e.code === 'KeyD') {
       RIGHT = true;
     }
-    if (e.key === 's') {
+    if (e.code === 'KeyS') {
       DOWN = true;
     }
   });
 
   canvas.addEventListener('keyup', (e) => {
-    if (e.key === 'a') {
+    if (e.code === 'KeyA') {
       LEFT = false;
     }
-    if (e.key === 'w') {
+    if (e.code === 'KeyW') {
       UP = false;
     }
-    if (e.key === 'd') {
+    if (e.code === 'KeyD') {
       RIGHT = false;
     }
-    if (e.key === 's') {
+    if (e.code === 'KeyS') {
       DOWN = false;
     }
   });
 
 
   if (LEFT) {
-    b.x--;
+    b.acc_x = -b.accelereation;
   }
   if (UP) {
-    b.y--;
+    b.acc_y = -b.accelereation;
   }
   if (RIGHT) {
-    b.x++;
+    b.acc_x = b.accelereation;
   }
   if (DOWN) {
-    b.y++;
+    b.acc_y = b.accelereation;
   }
+  if (!UP && !DOWN) b.acc_y = 0;
+  if (!RIGHT && !LEFT) b.acc_x = 0;
+  b.vel_x += b.acc_x;
+  b.vel_y += b.acc_y;
+  b.vel_x *= 1 - friction;
+  b.vel_y *= 1 - friction;
+  b.x += b.vel_x;
+  b.y += b.vel_y;
 
 }
 
 
 const Ball1 = new Ball(200, 200, 30);
-const Ball2 = new Ball(300, 300, 20);
 
 Ball1.player = true;
-Ball2.player = true;
 
 function mainLoop() {
   ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
   BALLZ.forEach((b) => {
+    b.drawBall();
     if (b.player) {
       keyControl(b);
     }
-    b.drawBall();
+    b.display();
   });
   requestAnimationFrame(mainLoop);
 }
