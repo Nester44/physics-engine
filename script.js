@@ -140,6 +140,7 @@ function keyControl(b) {
 
 const Ball1 = new Ball(200, 200, 30);
 const Ball2 = new Ball(300, 250, 40);
+const Ball3 = new Ball(250, 220, 35);
 
 Ball1.player = true;
 
@@ -166,16 +167,19 @@ function pen_res_bb(b1, b2) {
 
 function mainLoop() {
   ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
-  BALLZ.forEach((b) => {
+  BALLZ.forEach((b, index) => {
     b.drawBall();
     if (b.player) {
       keyControl(b);
     }
+    for (let i = index + 1; i < BALLZ.length; i++) {
+      if (coll_det_bb(BALLZ[index], BALLZ[i])) {
+        pen_res_bb(BALLZ[index], BALLZ[i]);
+      }
+    }
     b.display();
   });
-  if (coll_det_bb(Ball1, Ball2)) {
-    pen_res_bb(Ball1, Ball2);
-  }
+
   requestAnimationFrame(mainLoop);
 }
 
