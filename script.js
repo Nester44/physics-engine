@@ -57,8 +57,7 @@ class Vector {
 
 class Ball {
   constructor(x, y, r) {
-    this.x = x;
-    this.y = y;
+    this.pos = new Vector(x, y);
     this.r = r;
     this.vel = new Vector(0, 0);
     this.acc = new Vector(0, 0);
@@ -68,7 +67,7 @@ class Ball {
   }
   drawBall() {
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+    ctx.arc(this.pos.x, this.pos.y, this.r, 0, 2 * Math.PI);
     ctx.strokeStyle = 'black';
     ctx.stroke();
     ctx.fillStyle = 'red';
@@ -136,15 +135,34 @@ function keyControl(b) {
   b.acc = b.acc.unit().mult(b.accelereation);
   b.vel = b.vel.add(b.acc);
   b.vel = b.vel.mult(1 - friction);
-  b.x += b.vel.x;
-  b.y += b.vel.y;
-
+  b.pos = b.pos.add(b.vel);
 }
 
-
 const Ball1 = new Ball(200, 200, 30);
+const Ball2 = new Ball(300, 250, 40);
 
 Ball1.player = true;
+
+function round(number, precision) {
+  const factor = 10 ** precision;
+  return Math.round(number * factor) / factor;
+}
+
+function coll_det_bb(b1, b2) {
+  if (b1.r + b2.r >= b2.pos.subtr(b1.pos).mag()) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function pen_res_bb(b1, b2) {
+  const dist = b1.pos.subtr(b2.pos);
+  const pen_depth = b1.r + b2.r - dist.mag();
+  const pen_res = dist.unit().mult(pen_depth / 2);
+  b1.pos = b1.pos.add(pen_res);
+  b2.pos = b2.pos.add(pen_res.mult(-1));
+}
 
 function mainLoop() {
   ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
@@ -155,6 +173,9 @@ function mainLoop() {
     }
     b.display();
   });
+  if (coll_det_bb(Ball1, Ball2)) {
+    pen_res_bb(Ball1, Ball2);
+  }
   requestAnimationFrame(mainLoop);
 }
 
