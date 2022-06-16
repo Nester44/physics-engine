@@ -30,6 +30,22 @@ class Vector {
     return new Vector(this.x * n, this.y * n);
   }
 
+  unit() {
+    if (this.mag() === 0) {
+      return new Vector(0, 0);
+    } else {
+      return new Vector(this.x / this.mag(), this.y / this.mag());
+    }
+  }
+
+  static dot(v1, v2) {
+    return v1.x * v2.x + v1.y * v2.y;
+  }
+
+  normal() {
+    return new Vector(-this.y, this.x).unit();
+  }
+
   drawVec(start_x, start_y, n, color) {
     ctx.beginPath();
     ctx.moveTo(start_x, start_y);
@@ -60,8 +76,13 @@ class Ball {
   }
 
   display() {
-    this.vel.drawVec(this.x, this.y, 10, 'green');
-    this.acc.drawVec(this.x, this.y, 100, 'blue');
+    this.vel.drawVec(550, 400, 10, 'green');
+    this.acc.unit().drawVec(550, 400, 50, 'blue');
+    this.acc.normal().drawVec(550, 400, 50, 'black');
+    ctx.beginPath();
+    ctx.arc(550, 400, 50, 0, 2 * Math.PI);
+    ctx.strokeStyle = 'black';
+    ctx.stroke();
   }
 }
 
@@ -112,6 +133,7 @@ function keyControl(b) {
   if (!UP && !DOWN) b.acc.y = 0;
   if (!RIGHT && !LEFT) b.acc.x = 0;
 
+  b.acc = b.acc.unit().mult(b.accelereation);
   b.vel = b.vel.add(b.acc);
   b.vel = b.vel.mult(1 - friction);
   b.x += b.vel.x;
