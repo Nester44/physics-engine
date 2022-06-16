@@ -29,6 +29,14 @@ class Vector {
   mult(n) {
     return new Vector(this.x * n, this.y * n);
   }
+
+  drawVec(start_x, start_y, n, color) {
+    ctx.beginPath();
+    ctx.moveTo(start_x, start_y);
+    ctx.lineTo(start_x + this.x * n, start_y + this.y * n);
+    ctx.strokeStyle = color;
+    ctx.stroke();
+  }
 }
 
 class Ball {
@@ -36,10 +44,8 @@ class Ball {
     this.x = x;
     this.y = y;
     this.r = r;
-    this.vel_x = 0;
-    this.vel_y = 0;
-    this.acc_x = 0;
-    this.acc_y = 0;
+    this.vel = new Vector(0, 0);
+    this.acc = new Vector(0, 0);
     this.accelereation = 1;
     this.player = false;
     BALLZ.push(this);
@@ -54,17 +60,8 @@ class Ball {
   }
 
   display() {
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.x + this.acc_x * 100, this.y + this.acc_y * 100);
-    ctx.strokeStyle = 'green';
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.x + this.vel_x * 10, this.y + this.vel_y * 10);
-    ctx.strokeStyle = 'blue';
-    ctx.stroke();
+    this.vel.drawVec(this.x, this.y, 10, 'green');
+    this.acc.drawVec(this.x, this.y, 100, 'blue');
   }
 }
 
@@ -101,25 +98,24 @@ function keyControl(b) {
 
 
   if (LEFT) {
-    b.acc_x = -b.accelereation;
+    b.acc.x = -b.accelereation;
   }
   if (UP) {
-    b.acc_y = -b.accelereation;
+    b.acc.y = -b.accelereation;
   }
   if (RIGHT) {
-    b.acc_x = b.accelereation;
+    b.acc.x = b.accelereation;
   }
   if (DOWN) {
-    b.acc_y = b.accelereation;
+    b.acc.y = b.accelereation;
   }
-  if (!UP && !DOWN) b.acc_y = 0;
-  if (!RIGHT && !LEFT) b.acc_x = 0;
-  b.vel_x += b.acc_x;
-  b.vel_y += b.acc_y;
-  b.vel_x *= 1 - friction;
-  b.vel_y *= 1 - friction;
-  b.x += b.vel_x;
-  b.y += b.vel_y;
+  if (!UP && !DOWN) b.acc.y = 0;
+  if (!RIGHT && !LEFT) b.acc.x = 0;
+
+  b.vel = b.vel.add(b.acc);
+  b.vel = b.vel.mult(1 - friction);
+  b.x += b.vel.x;
+  b.y += b.vel.y;
 
 }
 
