@@ -72,6 +72,8 @@ class Ball {
     ctx.stroke();
     ctx.fillStyle = 'red';
     ctx.fill();
+    ctx.font = '30px Arial';
+    ctx.fillText(`N: ${BALLZ.indexOf(this) + 1}`, this.pos.x, this.pos.y);
   }
 
   display() {
@@ -86,6 +88,16 @@ class Ball {
 }
 
 function keyControl(b) {
+  canvas.addEventListener('keydown', (e) => {
+    const index = e.code.slice(-1) - 1;
+    if (!isNaN(index)) {
+      BALLZ.forEach((b) => {
+        b.player = false;
+      });
+      BALLZ[index].player = true;
+    }
+  });
+
   canvas.addEventListener('keydown', (e) => {
     if (e.code === 'KeyA') {
       LEFT = true;
