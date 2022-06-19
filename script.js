@@ -148,6 +148,11 @@ function keyControl(b) {
   b.vel = b.vel.add(b.acc);
   b.vel = b.vel.mult(1 - friction);
   b.pos = b.pos.add(b.vel);
+
+  if (b.pos.x < 0) b.pos.x = ctx.canvas.clientWidth - 10;
+  if (b.pos.x >= ctx.canvas.clientWidth) b.pos.x = 0;
+  if (b.pos.y <= 0) b.pos.y = ctx.canvas.clientHeight - 10;
+  if (b.pos.y >= ctx.canvas.clientHeight) b.pos.y = 0;
 }
 
 const Ball1 = new Ball(200, 200, 30);
